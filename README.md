@@ -11,6 +11,8 @@ styles found in the
 [styles.css](https://minhaskamal.github.io/DownGit/#/home?url=https:%2F%2Fgithub.com%2Fgoitacademy%2Freact-homework%2Fblob%2Fmaster%2Fhomework-03%2Fimage-finder%2Fstyles.css)
 file and adjust them to your preferences if needed.
 
+![preview](./assets/image-finder.jpg)
+
 ### Instructions for the Pixabay API
 
 Sign up to receive a private access key. Then, for your HTTP requests, utilize
