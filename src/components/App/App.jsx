@@ -90,7 +90,7 @@ export class App extends Component {
 
         {images.length > 0 && page <= totalPages && (
           <LoadMoreButton loadMore={this.onLoadMore}>
-            Load More...
+            Load More
           </LoadMoreButton>
         )}
 
