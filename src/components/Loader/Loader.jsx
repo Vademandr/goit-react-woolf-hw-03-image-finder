@@ -1,18 +1,18 @@
-import { Circles } from 'react-loader-spinner';
+import { Hourglass } from 'react-loader-spinner';
 import { LoaderWrapper } from './Loader.styled';
 
 export const Loader = () => {
   return (
     <LoaderWrapper>
-      <Circles
-        height="60"
-        width="60"
-        color="#3f51b5"
-        ariaLabel="blocks-loading"
-        wrapperStyle={{}}
-        wrapperClass=""
-        visible={true}
-      />
+      <Hourglass
+  visible={true}
+  height="80"
+  width="80"
+  ariaLabel="hourglass-loading"
+  wrapperStyle={{}}
+  wrapperClass=""
+  colors={['#306cce', '#72a1ed']}
+  />
     </LoaderWrapper>
   );
 };
