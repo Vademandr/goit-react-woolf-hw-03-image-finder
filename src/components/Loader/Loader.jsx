@@ -1,9 +1,20 @@
-import css from './Loader.module.css';
+import { Circles } from 'react-loader-spinner';
+import { LoaderWrapper } from './Loader.styled';
 
 export const Loader = () => {
   return (
-    <div className={css.Loader}>
-      <div></div>
-    </div>
+    <LoaderWrapper>
+      <Circles
+        height="60"
+        width="60"
+        color="#3f51b5"
+        ariaLabel="blocks-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        visible={true}
+      />
+    </LoaderWrapper>
   );
 };
+
+export default Loader;

@@ -1,15 +1,10 @@
-import styles from './Button.module.css';
+import { Button } from './Button.styled';
 
-export const Button = ({ onLoadMore, hasMore }) => {
+export const LoadMoreButton = ({ children, loadMore }) => {
   return (
-    <div className={styles.Wrapper}>
-      <button
-        className={styles.Button}
-        onClick={onLoadMore}
-        disabled={!hasMore}
-      >
-        Load more
-      </button>
-    </div>
+    <Button onClick={() => loadMore()} type="button">
+      {' '}
+      {children}{' '}
+    </Button>
   );
 };

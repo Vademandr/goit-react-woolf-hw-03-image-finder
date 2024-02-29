@@ -1,14 +1,18 @@
-import styles from './ImageGalleryItem.module.css';
+import { Item, Image } from './ImageGalleryItem.styled';
 
-export const ImageGalleryItem = ({ image, openModal }) => {
+export const ImageGalleryItem = ({
+  tags,
+  webformatURL,
+  largeImageURL,
+  showModal,
+}) => {
   return (
-    <li className={styles.ImageGalleryItem}>
-      <img
-        src={image.webformatURL}
-        alt={image.tags}
-        className={styles.ImageGalleryItemImage}
-        onClick={() => openModal(image.largeImageURL)}
+    <Item>
+      <Image
+        src={webformatURL}
+        alt={tags}
+        onClick={() => showModal(largeImageURL)}
       />
-    </li>
+    </Item>
   );
 };

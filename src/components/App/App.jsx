@@ -1,105 +1,105 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-
-import { Searchbar } from '../SearchBar/SearchBar';
+import { Component } from 'react';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { getImages } from '../../services/pixabayApi';
+import { Container } from './App.styled';
+import { LoadMoreButton } from '../Button/Button';
 import { ImageGallery } from '../ImageGallery/ImageGallery';
-import { Button } from '../Button/Button';
 import { Loader } from '../Loader/Loader';
 import { Modal } from '../Modal/Modal';
-import styles from './App.module.css';
+import { Searchbar } from '../SearchBar/SearchBar';
 
 export class App extends Component {
   state = {
-    images: [],
-    loading: false,
     page: 1,
-    modalOpen: false,
-    selectedImage: '',
+    totalPages: 0,
     query: '',
-    hasMore: true,
+    images: [],
+    error: null,
+    loading: false,
+    largeImageURL: '',
+    showModal: false,
   };
 
-  handleSearch = query => {
-    this.setState({ images: [], page: 1, query, hasMore: true });
-    this.searchImages(query);
+  componentDidUpdate(_, prevState) {
+    if (
+      prevState.query !== this.state.query ||
+      prevState.page !== this.state.page
+    ) {
+      this.addImages();
+    }
+  }
+
+  onSubmit = data => {
+    this.setState({ query: data, images: [], page: 1, totalPages: 0 });
   };
 
-  searchImages = async query => {
-    this.setState({ loading: true });
+  onLoadMore = () => {
+    this.setState(prev => ({
+      page: prev.page + 1,
+    }));
+  };
 
+  addImages = async () => {
     try {
-      const response = await axios.get(
-        `https://pixabay.com/api/?q=${query}&page=${this.state.page}&key=40909869-b3da28e56daa62163d671a2ba&image_type=photo&orientation=horizontal&per_page=12`
-      );
+      this.setState({ loading: true });
+      const data = await getImages(this.state.query, this.state.page);
 
-      this.setState(prevState => ({
-        images: [...prevState.images, ...response.data.hits],
-        hasMore: response.data.hits.length > 0,
+      const newImages = data.data.hits;
+
+      if (newImages.length === 0) {
+        return Notify.warning(
+          'Sorry, but no images were found for your request.'
+        );
+      }
+
+      const totalPages = Math.floor(data.data.total / 12);
+
+      this.setState(prev => ({
+        images: prev.images ? [...prev.images, ...newImages] : newImages,
+        totalPages: totalPages,
       }));
+
+      if (this.state.page === 1) {
+        return Notify.success(`${data.data.total} images found.`);
+      }
     } catch (error) {
-      console.error('Error fetching images:', error);
+      this.setState({ error: 'Sorry, an error occurred. Please try again.' });
+      Notify.error(`${error}`);
     } finally {
       this.setState({ loading: false });
     }
   };
 
-  loadMoreImages = async () => {
-    this.setState(
-      prevState => ({ page: prevState.page + 1 }),
-      async () => {
-        await this.searchImages(this.state.query);
-      }
-    );
+  toggleModal = largeImageURL => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+      largeImageURL: largeImageURL,
+    }));
   };
-
-  openModal = imageUrl => {
-    this.setState({ modalOpen: true, selectedImage: imageUrl });
-    document.body.style.overflow = 'hidden';
-  };
-
-  closeModal = () => {
-    this.setState({ modalOpen: false, selectedImage: '' });
-    document.body.style.overflow = '';
-  };
-
-  handleOverlayClick = e => {
-    if (e.target === e.currentTarget) {
-      this.closeModal();
-    }
-  };
-
-  handleKeyUp = e => {
-    if (e.key === 'Escape') {
-      this.closeModal();
-    }
-  };
-
-  componentDidMount() {
-    window.addEventListener('keyup', this.handleKeyUp);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keyup', this.handleKeyUp);
-  }
 
   render() {
-    const { images, loading, modalOpen, selectedImage, hasMore } = this.state;
-
+    const { images, page, totalPages, loading, largeImageURL, showModal } =
+      this.state;
     return (
-      <div className={styles.App}>
-        <Searchbar onSubmit={this.handleSearch} />
-        <ImageGallery images={images} openModal={this.openModal} />
-        {loading && <Loader />}
-        {images.length > 0 && hasMore && (
-          <Button onLoadMore={this.loadMoreImages} hasMore={!loading} />
+      <Container>
+        <Searchbar onSubmit={this.onSubmit} />
+
+        {images.length > 0 && (
+          <ImageGallery images={images} showModal={this.toggleModal} />
         )}
-        <Modal
-          isOpen={modalOpen}
-          closeModal={this.closeModal}
-          imageUrl={selectedImage}
-          onOverlayClick={this.handleOverlayClick}
-        />
-      </div>
+
+        {images.length > 0 && page <= totalPages && (
+          <LoadMoreButton loadMore={this.onLoadMore}>
+            Load More...
+          </LoadMoreButton>
+        )}
+
+        {loading && <Loader />}
+
+        {showModal && (
+          <Modal largeImageURL={largeImageURL} onClose={this.toggleModal} />
+        )}
+      </Container>
     );
   }
 }
